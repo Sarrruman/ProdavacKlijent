@@ -5,16 +5,33 @@
  */
 package frames;
 
+import beans.Adresa;
+import beans.Apartman;
+import beans.Soba;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.jms.Destination;
+import javax.jms.JMSConsumer;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.JMSProducer;
+import javax.jms.Message;
+import javax.jms.ObjectMessage;
+import utils.Helpers;
+import utils.TipZahteva;
+
 /**
  *
  * @author malenicn
  */
 public class SobeUnos extends javax.swing.JFrame {
 
-    /**
-     * Creates new form SobeUnos
-     */
-    public SobeUnos() {
+    private Apartman apartman;
+
+    public SobeUnos(Apartman a) {
+        this.apartman = a;
         initComponents();
     }
 
@@ -27,57 +44,175 @@ public class SobeUnos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        opis = new javax.swing.JTextField();
+        rBroj = new javax.swing.JSpinner();
+        jButton1 = new javax.swing.JButton();
+        status = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        bOsoba = new javax.swing.JSpinner();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                closingHandler(evt);
+            }
+        });
+
+        jButton1.setText("Unesi");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        status.setText("");
+
+        jLabel5.setText("Redni broj:");
+
+        jLabel6.setText("Opis:");
+
+        jLabel7.setText("Broj osoba:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE))
+                        .addComponent(jButton1)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(opis)
+                        .addGap(58, 58, 58))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(rBroj, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(bOsoba, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(381, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(69, 69, 69)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(opis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(rBroj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(38, 38, 38)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(bOsoba, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(231, 231, 231)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(status))
+                .addContainerGap(199, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        Soba s = new Soba();
+        s.setApartman(apartman);
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SobeUnos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SobeUnos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SobeUnos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SobeUnos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            rBroj.commitEdit();
+        } catch (java.text.ParseException e) {
         }
-        //</editor-fold>
+        Number n = (Number) rBroj.getValue();
+        s.setRedBr(n.longValue());
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new SobeUnos().setVisible(true);
+        try {
+            bOsoba.commitEdit();
+        } catch (java.text.ParseException e) {
+        }
+        n = (Number) bOsoba.getValue();
+        s.setBrOsoba(n.longValue());
+
+        s.setOpis(opis.getText());
+
+        JMSContext context = prodavac.Prodavac.connectionFactory.createContext();
+
+        Destination destination = prodavac.Prodavac.zahtevi;
+
+        JMSConsumer consumer = context.createConsumer(prodavac.Prodavac.odgovori, Helpers.getId(prodavac.Prodavac.prodavac.getUsername(),
+                prodavac.Prodavac.prodavac.getPassword()));
+        JMSProducer producer = context.createProducer();
+
+        ObjectMessage zahtev = context.createObjectMessage();
+        try {
+            zahtev.setStringProperty("id", prodavac.Prodavac.prodavac.getUsername()
+                    + prodavac.Prodavac.prodavac.getPassword());
+            zahtev.setStringProperty("username", prodavac.Prodavac.prodavac.getUsername());
+            zahtev.setStringProperty("password", prodavac.Prodavac.prodavac.getPassword());
+
+            zahtev.setObject(s);
+            zahtev.setIntProperty("tip", TipZahteva.UNOS_SOBE.ordinal());
+
+            producer.send(destination, zahtev);
+        } catch (JMSException ex) {
+            Logger.getLogger(LoginPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Message odgovor = consumer.receive();
+        if (odgovor instanceof ObjectMessage) {
+
+            try {
+                Object objekat = ((ObjectMessage) odgovor).getObject();
+                if (objekat != null) {
+                    status.setText("Success");
+                    List<Soba> sobe = apartman.getSobe();
+                    if (sobe == null) {
+                        sobe = new ArrayList<>();
+                        sobe.add((Soba) objekat);
+                        apartman.setSobe(sobe);
+                    } else {
+                        apartman.getSobe().add((Soba) objekat);
+                    }
+                } else {
+                    status.setText("Error");
+                }
+            } catch (JMSException ex) {
+                Logger.getLogger(SobeUnos.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
-    }
+
+        } else {
+            status.setText("Greska u komunikaciji - odgovor Posrednika nije tipa TextMessage");
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void closingHandler(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closingHandler
+        prodavac.Prodavac.sobePanel.revalidate();
+        prodavac.Prodavac.sobePanel.repaint();
+        prodavac.Prodavac.sobePanel.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_closingHandler
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSpinner bOsoba;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JTextField opis;
+    private javax.swing.JSpinner rBroj;
+    private javax.swing.JLabel status;
     // End of variables declaration//GEN-END:variables
 }

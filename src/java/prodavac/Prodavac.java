@@ -5,6 +5,7 @@ import frames.ApartmaniPanel;
 import frames.HomePanel;
 import frames.LoginPanel;
 import frames.PromenaKorisnickihPodataka;
+import frames.SobePanel;
 import javax.annotation.Resource;
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
@@ -17,6 +18,7 @@ public class Prodavac {
     public static HomePanel homePanel;
     public static LoginPanel loginPanel;
     public static PromenaKorisnickihPodataka promenaPodataka;
+    public static SobePanel sobePanel;
 
     @Resource(lookup = "Zahtevi")
     public static Queue zahtevi;

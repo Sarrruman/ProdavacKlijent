@@ -236,7 +236,7 @@ public class ApartmanUnos extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void closingHandler(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closingHandler
-        prodavac.Prodavac.apartmaniPanel.setVisible(true);
+        prodavac.Prodavac.apartmaniPanel.refresh();
         this.dispose();
     }//GEN-LAST:event_closingHandler
 
