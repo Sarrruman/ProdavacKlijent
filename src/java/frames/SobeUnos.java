@@ -198,9 +198,7 @@ public class SobeUnos extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void closingHandler(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closingHandler
-        prodavac.Prodavac.sobePanel.revalidate();
-        prodavac.Prodavac.sobePanel.repaint();
-        prodavac.Prodavac.sobePanel.setVisible(true);
+        prodavac.Prodavac.sobePanel.refresh();
         this.dispose();
     }//GEN-LAST:event_closingHandler
 

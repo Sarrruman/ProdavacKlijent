@@ -199,9 +199,7 @@ public class SobeIzmena extends javax.swing.JFrame {
     }
 
     private void closingHandler(java.awt.event.WindowEvent evt) {
-        prodavac.Prodavac.sobePanel.revalidate();
-        prodavac.Prodavac.sobePanel.repaint();
-        prodavac.Prodavac.sobePanel.setVisible(true);
+        prodavac.Prodavac.sobePanel.refresh();
         this.dispose();
     }
 

@@ -249,7 +249,7 @@ public class PromenaKorisnickihPodataka extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void closingHandler(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closingHandler
-        prodavac.Prodavac.homePanel.setVisible(true);
+        prodavac.Prodavac.homePanel.refresh();
         this.dispose();
     }//GEN-LAST:event_closingHandler
 

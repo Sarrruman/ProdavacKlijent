@@ -8,6 +8,7 @@ package frames;
 import beans.*;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -32,7 +33,18 @@ import utils.TipZahteva;
  */
 public class SobePanel extends javax.swing.JFrame {
 
-    private Apartman apartman;
+    public void refresh() {
+        if (!this.isVisible()) {
+            this.setVisible(true);
+        }
+        Point point = this.getLocationOnScreen();
+        prodavac.Prodavac.sobePanel = new SobePanel(this.apartman);
+        prodavac.Prodavac.sobePanel.setLocation(point);
+        prodavac.Prodavac.sobePanel.setVisible(true);
+
+        this.dispose();
+    }
+    public Apartman apartman;
 
     public SobePanel(Apartman a) {
         initComponents();
@@ -108,8 +120,7 @@ public class SobePanel extends javax.swing.JFrame {
                                         break;
                                     }
                                 }
-                                panel.revalidate();
-                                panel.repaint();
+                                panel.refresh();
                             } else {
 
                             }

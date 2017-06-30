@@ -24,7 +24,7 @@ import beans.*;
  * @author malenicn
  */
 public class ApartmanIzmena extends javax.swing.JFrame {
-    
+
     private Apartman a;
 
     /**
@@ -43,7 +43,7 @@ public class ApartmanIzmena extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
-        
+
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -58,48 +58,48 @@ public class ApartmanIzmena extends javax.swing.JFrame {
         broj = new javax.swing.JSpinner();
         jButton1 = new javax.swing.JButton();
         status = new javax.swing.JLabel();
-        
+
         ime.setText(a.getIme());
         drzava.setText(a.getAdresa().getDrzava());
         grad.setText(a.getAdresa().getGrad());
         ulica.setText(a.getAdresa().getUlica());
         opis.setText(a.getAdresa().getOpis());
         broj.setValue(a.getAdresa().getBroj());
-        
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closingHandler(evt);
             }
         });
-        
+
         jLabel1.setText("Ime:");
-        
+
         jLabel2.setText("Drzava:");
-        
+
         jLabel3.setText("Grad:");
-        
+
         jLabel4.setText("Ulica:");
-        
+
         jLabel5.setText("Broj:");
-        
+
         jLabel6.setText("Opis:");
-        
+
         ime.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 imeActionPerformed(evt);
             }
         });
-        
+
         jButton1.setText("Unesi");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        
+
         status.setText("");
-        
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -168,69 +168,69 @@ public class ApartmanIzmena extends javax.swing.JFrame {
                                         .addComponent(status))
                                 .addContainerGap(105, Short.MAX_VALUE))
         );
-        
+
         pack();
     }// </editor-fold>                        
 
     private void imeActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
     }
-    
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         Apartman aNovi = new Apartman();
         aNovi.setId(a.getId());
         aNovi.setProdavac(a.getProdavac());
-        
+
         aNovi.setIme(ime.getText());
         Adresa adr = new Adresa();
         adr.setId(a.getAdresa().getId());
-        
+
         try {
             broj.commitEdit();
         } catch (java.text.ParseException e) {
         }
         Number n = (Number) broj.getValue();
         adr.setBroj(n.longValue());
-        
+
         adr.setDrzava(drzava.getText());
         adr.setGrad(grad.getText());
         adr.setOpis(opis.getText());
         adr.setUlica(ulica.getText());
-        
+
         aNovi.setAdresa(adr);
         adr.setApartman(aNovi);
-        
+
         JMSContext context = prodavac.Prodavac.connectionFactory.createContext();
-        
+
         Destination destination = prodavac.Prodavac.zahtevi;
-        
+
         JMSConsumer consumer = context.createConsumer(prodavac.Prodavac.odgovori, Helpers.getId(prodavac.Prodavac.prodavac.getUsername(),
                 prodavac.Prodavac.prodavac.getPassword()));
         JMSProducer producer = context.createProducer();
-        
+
         ObjectMessage zahtev = context.createObjectMessage();
         try {
             zahtev.setStringProperty("id", prodavac.Prodavac.prodavac.getUsername()
                     + prodavac.Prodavac.prodavac.getPassword());
             zahtev.setStringProperty("username", prodavac.Prodavac.prodavac.getUsername());
             zahtev.setStringProperty("password", prodavac.Prodavac.prodavac.getPassword());
-            
+
             zahtev.setObject(aNovi);
             zahtev.setIntProperty("tip", TipZahteva.IZMENA_APARTMANA.ordinal());
-            
+
             producer.send(destination, zahtev);
         } catch (JMSException ex) {
             Logger.getLogger(LoginPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         Message odgovor = consumer.receive();
         if (odgovor instanceof ObjectMessage) {
-            
+
             try {
                 Object objekat = ((ObjectMessage) odgovor).getObject();
                 if (objekat != null) {
                     status.setText("Success");
-                    
+
                     a.setIme(ime.getText());
                     Adresa adrUpdate = a.getAdresa();
                     adrUpdate.setBroj(adr.getBroj());
@@ -244,14 +244,14 @@ public class ApartmanIzmena extends javax.swing.JFrame {
             } catch (JMSException ex) {
                 Logger.getLogger(PromenaKorisnickihPodataka.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         } else {
             jLabel3.setText("Greska u komunikaciji - odgovor Posrednika nije tipa TextMessage");
         }
     }
-    
+
     private void closingHandler(java.awt.event.WindowEvent evt) {
-        prodavac.Prodavac.apartmaniPanel.setVisible(true);
+        prodavac.Prodavac.apartmaniPanel.refresh();
         this.dispose();
     }
 

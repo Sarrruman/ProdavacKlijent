@@ -5,11 +5,24 @@
  */
 package frames;
 
+import java.awt.Point;
+
 /**
  *
  * @author malenicn
  */
 public class HomePanel extends javax.swing.JFrame {
+
+    public void refresh() {
+        if (!this.isVisible()) {
+            this.setVisible(true);
+        }
+        HomePanel np = new HomePanel();
+        Point point = this.getLocationOnScreen();
+        np.setLocation((int) point.getX(), (int) point.getY());
+        np.setVisible(true);
+        this.dispose();
+    }
 
     /**
      * Creates new form HomePanel

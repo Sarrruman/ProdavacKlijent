@@ -21,6 +21,7 @@ import utils.TipZahteva;
 import beans.*;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -32,9 +33,14 @@ public class ApartmaniPanel extends javax.swing.JFrame {
     private JLabel status;
 
     public void refresh() {
-
+        if (!this.isVisible()) {
+            this.setVisible(true);
+        }
+        Point point = this.getLocationOnScreen();
         prodavac.Prodavac.apartmaniPanel = new ApartmaniPanel();
+        prodavac.Prodavac.apartmaniPanel.setLocation(point);
         prodavac.Prodavac.apartmaniPanel.setVisible(true);
+
         this.dispose();
     }
 
@@ -120,8 +126,7 @@ public class ApartmaniPanel extends javax.swing.JFrame {
                                         break;
                                     }
                                 }
-                                panel.revalidate();
-                                panel.repaint();
+                                panel.refresh();
                             } else {
                                 status.setText("Morate prvo obrisati sve sobe");
                             }
