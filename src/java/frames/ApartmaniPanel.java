@@ -1,23 +1,176 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package frames;
 
-/**
- *
- * @author malenicn
- */
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.jms.Destination;
+import javax.jms.JMSConsumer;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.JMSProducer;
+import javax.jms.Message;
+import javax.jms.ObjectMessage;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import messages.Login;
+import prodavac.Prodavac;
+import utils.Helpers;
+import utils.TipZahteva;
+import beans.*;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import javax.swing.JPanel;
+
 public class ApartmaniPanel extends javax.swing.JFrame {
 
-    /**
-     * Creates new form ApartmaniPanel
-     */
+    @SuppressWarnings("Convert2Lambda")
     public ApartmaniPanel() {
         initComponents();
+
+        List<Apartman> apartmani = prodavac.Prodavac.prodavac.getApartmani();
+
+        this.setLayout(new GridLayout(apartmani.size(), 3));
+        for (int i = 0; i < apartmani.size(); i++) {
+            JButton glavno = new JButton(apartmani.get(i).getIme());
+            JButton obrisi = new JButton("Obrisi");
+            JButton sobe = new JButton("Sobe");
+
+            // paneli za resizing
+            JPanel gp = new JPanel(), op = new JPanel(), sp = new JPanel();
+            gp.add(glavno);
+            op.add(obrisi);
+            sp.add(sobe);
+
+            glavno.setPreferredSize(new Dimension(200, 40));
+            obrisi.setPreferredSize(new Dimension(200, 40));
+            sobe.setPreferredSize(new Dimension(200, 40));
+
+            glavno.addActionListener(new ActionListener() {
+                private Apartman a;
+                private ApartmaniPanel panel;
+
+                public void actionPerformed(ActionEvent e) {
+                    new ApartmanIzmena(a).setVisible(true);
+                    panel.setVisible(false);
+                }
+
+                private ActionListener init(Apartman a, ApartmaniPanel panel) {
+                    this.a = a;
+                    this.panel = panel;
+                    return this;
+                }
+            }.init(apartmani.get(i), this));
+
+            obrisi.addActionListener(new ActionListener() {
+                private Apartman a;
+                private ApartmaniPanel panel;
+
+                public void actionPerformed(ActionEvent e) {
+                    JMSContext context = Prodavac.connectionFactory.createContext();
+
+                    Destination destination = Prodavac.zahtevi;
+                    String username = prodavac.Prodavac.prodavac.getUsername();
+                    String password = prodavac.Prodavac.prodavac.getPassword();
+
+                    JMSConsumer consumer = context.createConsumer(Prodavac.odgovori, Helpers.getId(username, password));
+                    JMSProducer producer = context.createProducer();
+
+                    ObjectMessage zahtev = context.createObjectMessage();
+                    try {
+                        zahtev.setStringProperty("id", username + password);
+
+                        zahtev.setObject(a);
+                        zahtev.setIntProperty("tip", TipZahteva.BRISANJE_APARTMANA.ordinal());
+
+                        producer.send(destination, zahtev);
+                    } catch (JMSException ex) {
+                        Logger.getLogger(LoginPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    Message odgovor = consumer.receive();
+                    if (odgovor instanceof ObjectMessage) {
+                        try {
+                            Object objekat = ((ObjectMessage) odgovor).getObject();
+                            if (objekat != null) {
+                                List<Apartman> aps = prodavac.Prodavac.prodavac.getApartmani();
+                                for (Apartman atek : aps) {
+                                    if (atek.getId().equals(a.getId())) {
+                                        aps.remove(atek);
+                                        break;
+                                    }
+                                }
+                            } else {
+
+                            }
+                        } catch (JMSException ex) {
+                            Logger.getLogger(LoginPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } else {
+                    }
+                }
+
+                private ActionListener init(Apartman a, ApartmaniPanel panel) {
+                    this.a = a;
+                    this.panel = panel;
+                    return this;
+                }
+            }.init(apartmani.get(i), this));
+
+            this.add(gp);
+            this.add(op);
+            this.add(sp);
+        }
     }
 
+//    private void dohvatiApartmane() {
+//        JMSContext context = Prodavac.connectionFactory.createContext();
+//
+//        Destination destination = Prodavac.zahtevi;
+//        String username = prodavac.Prodavac.prodavac.getUsername();
+//        String password = prodavac.Prodavac.prodavac.getPassword();
+//
+//        JMSConsumer consumer = context.createConsumer(Prodavac.odgovori, Helpers.getId(username, password));
+//        JMSProducer producer = context.createProducer();
+//
+//        ObjectMessage zahtev = context.createObjectMessage();
+//        try {
+//            zahtev.setStringProperty("id", username + password);
+//
+//            zahtev.setObject(new String());
+//            zahtev.setIntProperty("tip", TipZahteva.DOHVATANJE_APARTMANA_ZA_PRODAVCA.ordinal());
+//
+//            producer.send(destination, zahtev);
+//        } catch (JMSException ex) {
+//            Logger.getLogger(LoginPanel.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//        Message odgovor = consumer.receive();
+//        if (odgovor instanceof ObjectMessage) {
+//            try {
+//                Object objekat = ((ObjectMessage) odgovor).getObject();
+//                if (objekat != null) {
+//                    jLabel3.setText("Success");
+//                    prodavac.Prodavac.prodavac = (beans.Prodavac) objekat;
+//
+//                    // close this window and open new home panel
+//                    this.setVisible(false);
+//                    prodavac.Prodavac.homePanel = new HomePanel();
+//                    prodavac.Prodavac.homePanel.setVisible(true);
+//                } else {
+//                    jLabel3.setText("Error");
+//                }
+//            } catch (JMSException ex) {
+//                Logger.getLogger(LoginPanel.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        } else {
+//            jLabel3.setText("Greska u komunikaciji - odgovor Posrednika nije tipa TextMessage");
+//        }
+//    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,21 +180,54 @@ public class ApartmaniPanel extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                closingHandler(evt);
+            }
+        });
+
+        jMenu1.setText("Home");
+
+        jMenuItem1.setText("Unos apartmana");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 791, Short.MAX_VALUE)
+            .addGap(0, 774, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 672, Short.MAX_VALUE)
+            .addGap(0, 626, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void closingHandler(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closingHandler
+        prodavac.Prodavac.homePanel.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_closingHandler
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        prodavac.Prodavac.apartmanUnos = new ApartmanUnos();
+        prodavac.Prodavac.apartmanUnos.setVisible(true);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -79,5 +265,8 @@ public class ApartmaniPanel extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     // End of variables declaration//GEN-END:variables
 }

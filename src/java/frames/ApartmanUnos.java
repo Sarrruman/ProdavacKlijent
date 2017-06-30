@@ -5,6 +5,7 @@
  */
 package frames;
 
+import java.util.List;
 import beans.Prodavac;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ import javax.jms.ObjectMessage;
 import utils.Helpers;
 import utils.TipZahteva;
 import beans.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -56,7 +58,12 @@ public class ApartmanUnos extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         status = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                closingHandler(evt);
+            }
+        });
 
         jLabel1.setText("Ime:");
 
@@ -165,7 +172,12 @@ public class ApartmanUnos extends javax.swing.JFrame {
         Apartman a = new Apartman();
         a.setIme(ime.getText());
         Adresa adr = new Adresa();
-        adr.setBroj((int) broj.getValue());
+        try {
+            broj.commitEdit();
+        } catch (java.text.ParseException e) {
+        }
+        Number n = (Number) broj.getValue();
+        adr.setBroj(n.longValue());
         adr.setDrzava(drzava.getText());
         adr.setGrad(grad.getText());
         adr.setOpis(opis.getText());
@@ -203,6 +215,14 @@ public class ApartmanUnos extends javax.swing.JFrame {
                 Object objekat = ((ObjectMessage) odgovor).getObject();
                 if (objekat != null) {
                     status.setText("Success");
+                    List<Apartman> aps = prodavac.Prodavac.prodavac.getApartmani();
+                    if (aps == null) {
+                        aps = new ArrayList<>();
+                        aps.add((Apartman) objekat);
+                        prodavac.Prodavac.prodavac.setApartmani(aps);
+                    } else {
+                        prodavac.Prodavac.prodavac.getApartmani().add((Apartman) objekat);
+                    }
                 } else {
                     status.setText("Error");
                 }
@@ -214,6 +234,11 @@ public class ApartmanUnos extends javax.swing.JFrame {
             jLabel3.setText("Greska u komunikaciji - odgovor Posrednika nije tipa TextMessage");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void closingHandler(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closingHandler
+        prodavac.Prodavac.apartmaniPanel.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_closingHandler
 
     /**
      * @param args the command line arguments

@@ -45,7 +45,12 @@ public class PromenaKorisnickihPodataka extends javax.swing.JFrame {
         statusLabel = new javax.swing.JLabel();
         POSBr = new javax.swing.JSpinner();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                closingHandler(evt);
+            }
+        });
 
         jLabel1.setText("Username:");
 
@@ -117,7 +122,7 @@ public class PromenaKorisnickihPodataka extends javax.swing.JFrame {
                         .addComponent(surname))
                     .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(POSBr, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 45, Short.MAX_VALUE))
+                .addGap(0, 11, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -154,20 +159,25 @@ public class PromenaKorisnickihPodataka extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(statusLabel))
-                .addGap(0, 293, Short.MAX_VALUE))
+                .addGap(0, 259, Short.MAX_VALUE))
         );
 
-        POSBr.setValue(p.getPOSBr());
+        long value= p.getPOSBr();
+        POSBr.setValue(value);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 34, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 34, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -184,7 +194,13 @@ public class PromenaKorisnickihPodataka extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         beans.Prodavac pNovi = new Prodavac();
         pNovi.setId(p.getId());
-        pNovi.setPOSBr((int) POSBr.getValue());
+        try {
+            POSBr.commitEdit();
+        } catch (java.text.ParseException e) {
+            System.out.println("Parse exception: spinner parsning went bad");
+        }
+        int value = (Integer) POSBr.getValue();
+        pNovi.setPOSBr(value);
         pNovi.setEmail(email.getText());
         pNovi.setName(name.getText());
         pNovi.setPassword(password.getText());
@@ -231,6 +247,11 @@ public class PromenaKorisnickihPodataka extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void closingHandler(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closingHandler
+        prodavac.Prodavac.homePanel.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_closingHandler
 
     public static void main(String args[]) {
 

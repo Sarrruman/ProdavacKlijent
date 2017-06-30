@@ -16,6 +16,7 @@ public class Prodavac extends Korisnik implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private long POSBr;
+    private List<Apartman> apartmani;
 
     public long getPOSBr() {
         return POSBr;
@@ -23,6 +24,14 @@ public class Prodavac extends Korisnik implements Serializable {
 
     public void setPOSBr(long POSBr) {
         this.POSBr = POSBr;
+    }
+
+    public List<Apartman> getApartmani() {
+        return apartmani;
+    }
+
+    public void setApartmani(List<Apartman> apartmani) {
+        this.apartmani = apartmani;
     }
 
 }
